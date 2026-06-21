@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Note: --font-sans / --font-mono are provided by next/font on the <html>
+   element (see app/layout.tsx). We must NOT redefine them on :root here —
+   equal specificity means a :root rule would override next/font and silently
+   fall the app back to system fonts. The Tailwind font stacks already include
+   system fallbacks if the variables are ever absent. */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-surface-page text-ink antialiased;
+  font-feature-settings: "cv11", "ss01";
+  text-rendering: optimizeLegibility;
+}
+
+/* A soft, warm coral glow — the one spot of colour, used very sparingly behind
+   a hero element (empty state). Echoes the reference aesthetic. */
+.glow-accent {
+  position: relative;
+  isolation: isolate;
+}
+.glow-accent::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: -10%;
+  width: 70%;
+  height: 70%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    closest-side,
+    rgba(224, 83, 58, 0.16),
+    rgba(224, 83, 58, 0)
+  );
+  pointer-events: none;
+}
+
+/* Quiet focus ring — visible but understated, a soft grey (monochrome). */
+*:focus-visible {
+  outline: 2px solid theme("colors.ink.faint");
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ----------------------------------------------------------------------------
+   Range slider — precise, understated, fintech feel.
+   Styled consistently across WebKit and Firefox.
+---------------------------------------------------------------------------- */
+input[type="range"].slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"].slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: theme("colors.line.strong");
+}
+input[type="range"].slider::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: theme("colors.line.strong");
+}
+
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -8px;
+  height: 20px;
+  width: 20px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1.5px solid theme("colors.ink.DEFAULT");
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
+  transition: transform 0.1s ease;
+}
+input[type="range"].slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1.5px solid theme("colors.ink.DEFAULT");
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
+}
+input[type="range"].slider:active::-webkit-slider-thumb {
+  transform: scale(1.08);
+}
+
+/* Hide number input spinners for a cleaner look */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: theme("colors.line.strong");
+  border-radius: 999px;
+  border: 3px solid theme("colors.surface.page");
+}
