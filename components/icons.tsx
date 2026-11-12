@@ -16,6 +16,28 @@ function base(className?: string) {
   };
 }
 
+/**
+ * The Linger mark: two outlined bars that interlock into an "L".
+ * Draws in currentColor, so wrap it in a tile (bg-ink text-surface) or colour it directly.
+ * Keep geometry in sync with app/icon.svg.
+ */
+export function LingerMark({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="826 328 429 497"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={42}
+      strokeLinejoin="miter"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M847 349H973V676H957A110 110 0 0 1 847 566Z" />
+      <path d="M974 678H1234V804H1100A126 126 0 0 1 974 678Z" />
+    </svg>
+  );
+}
+
 export function PlusIcon({ className }: IconProps) {
   return (
     <svg {...base(className)}>

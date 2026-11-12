@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
+import { LingerMark } from "./icons";
 
 export default function LoginScreen() {
   const { login } = useStore();
@@ -29,9 +30,14 @@ export default function LoginScreen() {
         <p className="font-mono text-[0.8125rem] text-ink-faint">
           Some wants last, Most don&rsquo;t
         </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink">
-          Linger
-        </h1>
+        <div className="mt-2 flex items-center gap-3">
+          <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-ink text-surface">
+            <LingerMark className="h-[18px] w-auto" />
+          </span>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
+            Linger
+          </h1>
+        </div>
         <p className="mt-1.5 text-sm text-ink-muted">
           Enter your passphrase to open your list.
         </p>

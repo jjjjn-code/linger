@@ -25,7 +25,7 @@ import LetGoDialog from "./LetGoDialog";
 import CategoryManager from "./CategoryManager";
 import CategoryFilter from "./CategoryFilter";
 import LoginScreen from "./LoginScreen";
-import { DragHandleIcon, PlusIcon } from "./icons";
+import { DragHandleIcon, LingerMark, PlusIcon } from "./icons";
 
 type Editing = { mode: "add" } | { mode: "edit"; item: Item } | null;
 type Layout = "cards" | "list";
@@ -226,9 +226,14 @@ export default function AppView() {
           <p className="font-mono text-[0.8125rem] text-ink-faint">
             Some wants last, Most don&rsquo;t
           </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink">
-            Linger
-          </h1>
+          <div className="mt-2 flex items-center gap-3">
+            <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-ink text-surface">
+              <LingerMark className="h-[18px] w-auto" />
+            </span>
+            <h1 className="text-2xl font-semibold tracking-tight text-ink">
+              Linger
+            </h1>
+          </div>
           <p className="mt-1.5 max-w-md text-sm text-ink-muted">
             The wants that linger are the ones worth keeping. Log a want, let it
             sit, and see if it lasts.
