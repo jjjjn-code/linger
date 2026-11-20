@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FetchedMetadata, Item } from "@/lib/types";
 import { useStore } from "@/lib/store";
+import type { Prefill } from "@/lib/capture";
 import { formatLoggedDate, todayISODate } from "@/lib/format";
 import Modal from "./Modal";
 import ConfirmDialog from "./ConfirmDialog";
@@ -16,25 +17,34 @@ const labelCls = "block text-sm font-medium text-ink-soft mb-1.5";
 type FetchState =
   | { phase: "idle" }
   | { phase: "loading" }
-  | { phase: "done"; ok: boolean; message: string };
+  | { phase: "done"; ok: boolean; message: string; blocked?: boolean };
 
 export default function ItemForm({
   existing,
+  prefill,
   onClose,
 }: {
   existing?: Item;
+  /** Values captured by the bookmarklet — the add form opens already filled. */
+  prefill?: Prefill;
   onClose: () => void;
 }) {
   const { categories, addItem, updateItem, deleteItem, addCategory } =
     useStore();
   const isEdit = Boolean(existing);
 
-  const [url, setUrl] = useState(existing?.url ?? "");
-  const [name, setName] = useState(existing?.name ?? "");
-  const [brand, setBrand] = useState(existing?.brand ?? "");
-  const [imageUrl, setImageUrl] = useState(existing?.imageUrl ?? "");
+  const [url, setUrl] = useState(existing?.url ?? prefill?.url ?? "");
+  const [name, setName] = useState(existing?.name ?? prefill?.name ?? "");
+  const [brand, setBrand] = useState(existing?.brand ?? prefill?.brand ?? "");
+  const [imageUrl, setImageUrl] = useState(
+    existing?.imageUrl ?? prefill?.imageUrl ?? ""
+  );
   const [price, setPrice] = useState(
-    existing?.price != null ? String(existing.price) : ""
+    existing?.price != null
+      ? String(existing.price)
+      : prefill?.price != null
+      ? String(prefill.price)
+      : ""
   );
   const [categoryIds, setCategoryIds] = useState<string[]>(
     existing?.categoryIds ?? []
@@ -46,7 +56,15 @@ export default function ItemForm({
     existing?.loggedAt ?? todayISODate()
   );
 
-  const [fetchState, setFetchState] = useState<FetchState>({ phase: "idle" });
+  const [fetchState, setFetchState] = useState<FetchState>(
+    prefill
+      ? {
+          phase: "done",
+          ok: prefill.ok,
+          message: prefill.message ?? "Filled from the page you were on.",
+        }
+      : { phase: "idle" }
+  );
   const [newCategory, setNewCategory] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -80,6 +98,7 @@ export default function ItemForm({
         message:
           data.message ??
           (data.ok ? "Filled what we could find." : "Nothing found."),
+        blocked: data.blocked,
       });
     } catch {
       setFetchState({
@@ -209,12 +228,35 @@ export default function ItemForm({
           {fetchState.phase === "done" ? (
             <p className="mt-1.5 text-meta text-ink-muted">
               {fetchState.message} Have a look and tweak anything below.
+              {fetchState.blocked ? (
+                <>
+                  {" "}
+                  For the price and image,{" "}
+                  <a
+                    href="/bookmarklet"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2 hover:text-ink"
+                  >
+                    set up the Linger bookmarklet
+                  </a>{" "}
+                  — it reads the page from your own browser.
+                </>
+              ) : null}
             </p>
           ) : (
             <p className="mt-1.5 text-meta text-ink-faint">
-              Paste a link and I&rsquo;ll try to fill in the details for you. Plenty
-              of shops block this, so if it comes back empty, no worries — just
-              type things in yourself.
+              Paste a link and I&rsquo;ll try to fill in the details for you.
+              Some shops block this — for those, the{" "}
+              <a
+                href="/bookmarklet"
+                target="_blank"
+                rel="noreferrer"
+                className="underline underline-offset-2 hover:text-ink-muted"
+              >
+                bookmarklet
+              </a>{" "}
+              grabs everything from your own browser, or just type things in.
             </p>
           )}
         </div>

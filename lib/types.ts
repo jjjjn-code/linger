@@ -53,6 +53,8 @@ export interface FetchedMetadata {
   ok: boolean;
   /** Human-readable note about what happened (e.g. "blocked", "partial"). */
   message?: string;
+  /** The shop refused or timed out our server-side fetch (e.g. HTTP 403). */
+  blocked?: boolean;
 }
 
 /** The shape persisted locally. Versioned so future migrations are clean. */

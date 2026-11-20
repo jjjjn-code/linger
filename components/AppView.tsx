@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import type { Item, PersistedState } from "@/lib/types";
 import { todayISODate } from "@/lib/format";
@@ -14,6 +14,7 @@ import {
   type SortKey,
 } from "@/lib/sort";
 import { orderByRank } from "@/lib/rank";
+import { readCaptureFromHash, type Prefill } from "@/lib/capture";
 import ItemCard from "./ItemCard";
 import ItemListRow from "./ItemListRow";
 import BoughtCard from "./BoughtCard";
@@ -27,7 +28,10 @@ import CategoryFilter from "./CategoryFilter";
 import LoginScreen from "./LoginScreen";
 import { DragHandleIcon, LingerMark, PlusIcon } from "./icons";
 
-type Editing = { mode: "add" } | { mode: "edit"; item: Item } | null;
+type Editing =
+  | { mode: "add"; prefill?: Prefill }
+  | { mode: "edit"; item: Item }
+  | null;
 type Layout = "cards" | "list";
 type Section = "considering" | "bought" | "letgo" | "dashboard";
 
@@ -44,6 +48,27 @@ export default function AppView() {
     snapshot,
   } = useStore();
   const [editing, setEditing] = useState<Editing>(null);
+
+  // Bookmarklet hand-off: the page you were on arrives in the URL fragment
+  // (never sent to a server). Read it once, clear it from the address bar, and
+  // hold it until the list has loaded — in hosted mode that's after sign-in.
+  const [capture, setCapture] = useState<Prefill | null>(null);
+  useEffect(() => {
+    const found = readCaptureFromHash(window.location.hash);
+    if (window.location.hash.startsWith("#linger=")) {
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search
+      );
+    }
+    if (found) setCapture(found);
+  }, []);
+  useEffect(() => {
+    if (!capture || !ready) return;
+    setEditing({ mode: "add", prefill: capture });
+    setCapture(null);
+  }, [capture, ready]);
   const importInputRef = useRef<HTMLInputElement>(null);
   const [showCategories, setShowCategories] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -393,6 +418,9 @@ export default function AppView() {
             >
               Export
             </button>
+            <a href="/bookmarklet" className="transition-colors hover:text-ink">
+              Bookmarklet
+            </a>
             <button
               type="button"
               onClick={() => importInputRef.current?.click()}
@@ -427,7 +455,7 @@ export default function AppView() {
 
       {/* Modals */}
       {editing?.mode === "add" ? (
-        <ItemForm onClose={() => setEditing(null)} />
+        <ItemForm prefill={editing.prefill} onClose={() => setEditing(null)} />
       ) : null}
       {editing?.mode === "edit" ? (
         <ItemForm existing={editing.item} onClose={() => setEditing(null)} />
